@@ -62,6 +62,13 @@ android {
         compose = true
     }
 
+    testOptions {
+        unitTests {
+            // Without this every org.json call in a unit test throws "not mocked".
+            isReturnDefaultValues = true
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -82,4 +89,5 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     debugImplementation(libs.androidx.ui.tooling)
+    testImplementation(libs.junit)
 }

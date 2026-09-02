@@ -20,6 +20,12 @@ firmware `V1.2.1` (protocol v1, AES-128-ECB): subnet discovery, local bind, live
 polling and command writes all confirmed, with writes checked independently against the
 unit from a second client.
 
+<p align="center">
+  <img src="docs/shots/units.png" alt="Unit list" width="240">
+  <img src="docs/shots/control.png" alt="Controls" width="240">
+  <img src="docs/shots/swing.png" alt="Louver control" width="240">
+</p>
+
 ## Features
 
 - Discovers units by sweeping the local subnet (unicast plus broadcast)
@@ -48,6 +54,12 @@ Requires the Android SDK (compileSdk 36) and JDK 17 or newer.
 ```sh
 ./gradlew assembleDebug
 adb install app/build/outputs/apk/debug/app-debug.apk
+```
+
+Tests cover the protocol layer, which is the part that must not break silently:
+
+```sh
+./gradlew testDebugUnitTest
 ```
 
 ## Protocol notes

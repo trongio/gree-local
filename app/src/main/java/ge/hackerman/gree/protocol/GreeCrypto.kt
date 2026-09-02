@@ -1,6 +1,6 @@
 package ge.hackerman.gree.protocol
 
-import android.util.Base64
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
@@ -20,14 +20,13 @@ object GreeCrypto {
         }
 
     fun encrypt(plain: String, key: String = GENERIC_KEY): String =
-        Base64.encodeToString(
+        Base64.getEncoder().encodeToString(
             cipher(Cipher.ENCRYPT_MODE, key).doFinal(plain.toByteArray(Charsets.UTF_8)),
-            Base64.NO_WRAP,
         )
 
     fun decrypt(payload: String, key: String = GENERIC_KEY): String =
         String(
-            cipher(Cipher.DECRYPT_MODE, key).doFinal(Base64.decode(payload, Base64.NO_WRAP)),
+            cipher(Cipher.DECRYPT_MODE, key).doFinal(Base64.getDecoder().decode(payload)),
             Charsets.UTF_8,
         )
 }

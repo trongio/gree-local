@@ -31,14 +31,13 @@ object LanScanner {
             it.address is Inet4Address && !it.address.isLoopbackAddress
         } ?: return null
 
-        return expand(address)
+        return expand(address.address.address, address.prefixLength)
     }
 
-    private fun expand(link: LinkAddress): LocalSubnet? {
-        val prefix = link.prefixLength
+    /** Pure arithmetic, split out from [LinkAddress] so it can be tested off-device. */
+    internal fun expand(octets: ByteArray, prefix: Int): LocalSubnet? {
         if (prefix !in 16..30) return null
 
-        val octets = link.address.address
         val ip = octets.fold(0L) { acc, byte -> (acc shl 8) or (byte.toLong() and 0xFF) }
         val mask = (0xFFFFFFFFL shl (32 - prefix)) and 0xFFFFFFFFL
         val network = ip and mask
