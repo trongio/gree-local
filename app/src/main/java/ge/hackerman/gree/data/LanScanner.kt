@@ -9,6 +9,8 @@ import java.net.Inet4Address
 data class LocalSubnet(
     val hosts: List<String>,
     val broadcast: String?,
+    /** Human-readable network, e.g. "192.168.0.0/24". */
+    val cidr: String,
 )
 
 /**
@@ -49,7 +51,11 @@ object LanScanner {
             .filter { it != ip }
             .map { it.toIpString() }
 
-        return LocalSubnet(hosts = hosts, broadcast = broadcast.toIpString())
+        return LocalSubnet(
+            hosts = hosts,
+            broadcast = broadcast.toIpString(),
+            cidr = "${network.toIpString()}/$prefix",
+        )
     }
 
     private fun Long.toIpString(): String =

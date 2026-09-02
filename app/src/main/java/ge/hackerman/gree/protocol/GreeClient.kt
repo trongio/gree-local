@@ -24,6 +24,11 @@ class GreeUnreachableException(ip: String) : Exception("No reply from $ip")
  */
 class GreeClient(private val timeoutMs: Int = 2500) {
 
+    private companion object {
+        /** Fraction of the progress bar spent probing, the rest is the listen window. */
+        const val SEND_SHARE = 0.4f
+    }
+
     /**
      * Probes every host in [hosts] plus the broadcast address and collects whatever
      * answers within [windowMs]. Broadcast alone is unreliable: plenty of routers and
@@ -33,6 +38,7 @@ class GreeClient(private val timeoutMs: Int = 2500) {
         hosts: List<String>,
         broadcast: String?,
         windowMs: Long = 3000,
+        onProgress: (Float) -> Unit = {},
     ): List<DiscoveredUnit> = withContext(Dispatchers.IO) {
         val probe = JSONObject().put("t", "scan").toString().toByteArray()
         val found = LinkedHashMap<String, DiscoveredUnit>()
@@ -45,17 +51,25 @@ class GreeClient(private val timeoutMs: Int = 2500) {
                 broadcast?.let { add(it) }
                 addAll(hosts)
             }
-            for (host in targets) {
+            targets.forEachIndexed { index, host ->
                 runCatching {
                     socket.send(
                         DatagramPacket(probe, probe.size, InetAddress.getByName(host), Gree.PORT),
                     )
                 }
+                onProgress(SEND_SHARE * (index + 1) / targets.size)
             }
 
-            val deadline = System.currentTimeMillis() + windowMs
+            // Sending is quick; the listen window is most of the wall clock, so the bar
+            // keeps moving against elapsed time rather than freezing at the handover.
+            val started = System.currentTimeMillis()
+            val deadline = started + windowMs
             val buffer = ByteArray(4096)
-            while (System.currentTimeMillis() < deadline) {
+            while (true) {
+                val now = System.currentTimeMillis()
+                if (now >= deadline) break
+                onProgress(SEND_SHARE + (1f - SEND_SHARE) * (now - started) / windowMs)
+
                 val packet = DatagramPacket(buffer, buffer.size)
                 try {
                     socket.receive(packet)
@@ -65,6 +79,7 @@ class GreeClient(private val timeoutMs: Int = 2500) {
                 val unit = parseScanReply(packet) ?: continue
                 found.putIfAbsent(unit.mac, unit)
             }
+            onProgress(1f)
         }
         found.values.toList()
     }

@@ -28,6 +28,12 @@ object Gree {
         SLEEP, LIGHT, SWING_HORIZONTAL, SWING_VERTICAL, QUIET, TURBO, SAVE_POWER, ROOM_TEMP,
     )
 
+    /** Both swing axes share a shape: 0 off, 1 full sweep, 2..6 fixed positions. */
+    const val SWING_OFF = 0
+    const val SWING_FULL = 1
+    const val SWING_FIRST_FIXED = 2
+    const val SWING_FIXED_COUNT = 5
+
     const val MIN_TEMP = 16
     const val MAX_TEMP = 30
 
@@ -78,6 +84,21 @@ enum class GreeSwing(val raw: Int, val label: String) {
     }
 }
 
+/** Horizontal louver positions. Values 2..6 are fixed angles, left to right. */
+enum class GreeSwingH(val raw: Int, val label: String) {
+    OFF(0, "Off"),
+    FULL(1, "Full"),
+    LEFT(2, "Left"),
+    LEFT_CENTER(3, "Left-center"),
+    CENTER(4, "Center"),
+    RIGHT_CENTER(5, "Right-center"),
+    RIGHT(6, "Right");
+
+    companion object {
+        fun from(raw: Int?): GreeSwingH = entries.firstOrNull { it.raw == raw } ?: OFF
+    }
+}
+
 /** A decoded status snapshot. Unknown fields stay null rather than defaulting to 0. */
 data class GreeState(
     val raw: Map<String, Int>,
@@ -87,6 +108,7 @@ data class GreeState(
     val targetTemp: Int get() = raw[Gree.SET_TEMP] ?: Gree.MIN_TEMP
     val fan: GreeFan get() = GreeFan.from(raw[Gree.FAN_SPEED])
     val swingVertical: GreeSwing get() = GreeSwing.from(raw[Gree.SWING_VERTICAL])
+    val swingHorizontal: GreeSwingH get() = GreeSwingH.from(raw[Gree.SWING_HORIZONTAL])
     val turbo: Boolean get() = raw[Gree.TURBO] == 1
     val quiet: Boolean get() = (raw[Gree.QUIET] ?: 0) > 0
     val light: Boolean get() = raw[Gree.LIGHT] == 1
