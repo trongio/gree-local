@@ -9,15 +9,16 @@ policy prohibits a listing that suggests an affiliation that does not exist, and
 beginning with another company's brand is the usual way apps trip it. A takedown here
 costs the listing, not just a review round.
 
-Safer options, roughly in order:
+**Decision taken:** keep the name, qualify it. The Play title is
+`Gree Local (unofficial)` and the description opens with the non-affiliation notice.
+That is the mitigation, so do not quietly trim either one to save characters.
 
-- rename to something that does not lead with the brand, and describe compatibility in
-  the description instead ("works with Gree and compatible air conditioners")
-- if the brand stays in the title, put "unofficial" in it, and keep the
-  "not affiliated with" line in the description
+Residual risk is real but reduced: the title still leads with the brand. If Google ever
+objects, the fallback is a rename that does not lead with it, describing compatibility in
+the description instead ("works with Gree and compatible air conditioners"). The launcher
+label stays the short "Gree Local" so it fits under the icon.
 
-Changing the display name is cheap. Changing `applicationId` is not: it is permanent once
-published, so decide before the first upload.
+`applicationId` is `ge.hackerman.gree` and is permanent once published.
 
 ### 2. Personal accounts need 12 testers for 14 days
 

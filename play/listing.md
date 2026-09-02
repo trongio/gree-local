@@ -1,12 +1,18 @@
 # Play Store listing draft
 
 ## Title (30 char limit)
-Gree Local            <- see the trademark note in RELEASING.md before using this
+Gree Local (unofficial)
+
+23 characters. The qualifier is load-bearing: it is what separates this from a listing
+that implies the manufacturer published it. Do not drop it to save room.
 
 ## Short description (80 char limit)
 Control your air conditioner over Wi-Fi. No cloud account, no internet needed.
 
 ## Full description (4000 char limit)
+UNOFFICIAL APP. Not affiliated with, endorsed by, or connected to Gree Electric
+Appliances. Gree is a trademark of its respective owner.
+
 Gree Local controls compatible air conditioners directly over your own Wi-Fi network.
 
 Air conditioners with a Wi-Fi module speak a simple protocol on the local network. The

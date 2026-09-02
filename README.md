@@ -5,6 +5,10 @@
 A native Android app for controlling Gree air conditioners **entirely over your LAN**.
 No cloud account, no vendor servers, no internet connection required.
 
+> **Unofficial.** Not affiliated with, endorsed by, or connected to Gree Electric
+> Appliances. Gree is a trademark of its respective owner. Protocol details come from
+> public reverse engineering work by the community.
+
 Gree units with a Wi-Fi module speak a simple UDP protocol on port 7000. The vendor
 apps use it too, but only after routing you through a cloud signup. This app skips that
 part: it discovers units on your subnet, binds directly, and talks to them over the wire.
@@ -80,6 +84,3 @@ that explanation is inference from the measurement above.
 The app deliberately does **not** correct for it. The constant probably varies by model,
 and compensating would make the app disagree with the unit's own display and remote.
 
-## Not affiliated with Gree
-
-Protocol details are from public reverse engineering work by the community.
