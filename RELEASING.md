@@ -108,10 +108,7 @@ and versionCode 1 is on the internal track.
 | Financial features | None |
 | Health apps | None |
 
-**Outstanding, and it needs doing by hand:** store listing contact details, under Grow
-users > Store presence > Store settings. The email and website fields do not accept
-programmatic input, so type them: `giokakabadze50@gmail.com` and
-`https://github.com/trongio/gree-local`. The app category is already set to House & Home.
+App setup is complete. Contact email `giokakabadze50@gmail.com`, category House & Home.
 
 Tablet screenshots are marked required on the listing but did not block saving. They will
 likely be needed before review; the app is phone-shaped, so either run it on a tablet
@@ -123,16 +120,18 @@ Play email lists are account-level, so the `TESTERS` list already used by the Pr
 (18 people) is attached to this app's internal track as well. It is literally the same
 list, so editing it changes both apps' testers.
 
-### Ordering constraint on the closed test
+### Closed testing track: 3 of 4
 
-The closed test cannot be created yet. The API refuses it:
+`Closed testing - Alpha` is set up with the 18-person `TESTERS` list and 177 countries.
+The release is a **draft** of versionCode 1.
+
+It has to be a draft: while the app has never been through review it counts as a "draft
+app", and the API rejects anything else with
 
     Only releases with status draft may be created on draft app.
 
-The app is still a Draft app, and it leaves that state only once setup is complete and the
-listing goes for review. So the order is: finish the contact details field, send for
-review, then create the closed test, then 12 testers for 14 days, then apply for
-production.
+The only step left is sending it to Google for review, which is what takes the app out of
+draft and starts the 14-day tester clock.
 
 Everything after that is scripted:
 
