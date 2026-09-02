@@ -1,0 +1,5 @@
+First release.
+
+Control your air conditioner directly over your own Wi-Fi: power, mode, temperature,
+fan speed and both louver axes, with the room temperature read from the unit itself.
+Includes a home screen widget. No account, no cloud, works with the internet off.

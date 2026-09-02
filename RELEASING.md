@@ -76,15 +76,34 @@ keytool -genkeypair -v \
 Either way the keystore must be backed up. Losing it means never being able to update the
 listing again.
 
-## Each release
+## Publishing from the command line
+
+The account already has a Play service account, the one set up for the Prava app:
+
+- key `~/.config/play/trongio-key.json`, service account
+  `calude@prava-play-api.iam.gserviceaccount.com`, Cloud project `prava-play-api`
+- verified working against both `androidpublisher` and `playdeveloperreporting`
+
+**The API cannot create an app.** Confirmed by probing it: `com.prava.trongio` opens an
+edit and returns 200, `ge.hackerman.gree` returns `404 Package not found`. So the first
+step is console-only, and it is also the step that asks you to accept the developer
+program policy and export declarations, which is yours to accept, not mine.
+
+1. Play Console, **Create app**: name `Gree Local (unofficial)`, app, free.
+2. Fill the store listing from `play/listing.md`, and upload the assets in `play/`.
+3. Everything after that is scripted:
 
 ```sh
 ./gradlew bundleRelease
-# app/build/outputs/bundle/release/app-release.aab
+tools/play_upload.py app/build/outputs/bundle/release/app-release.aab \
+    internal "0.1.0" completed
 ```
 
 Bump `versionCode` (must increase every upload) and `versionName` in
 `app/build.gradle.kts` first. Play takes the `.aab`, not the `.apk`.
+
+Track names: `internal`, `alpha` (closed testing, where the 12-tester clock runs),
+`beta` (open), `production`.
 
 ## Listing assets
 
