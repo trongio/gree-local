@@ -89,9 +89,19 @@ edit and returns 200, `ge.hackerman.gree` returns `404 Package not found`. So th
 step is console-only, and it is also the step that asks you to accept the developer
 program policy and export declarations, which is yours to accept, not mine.
 
-1. Play Console, **Create app**: name `Gree Local (unofficial)`, app, free.
-2. Fill the store listing from `play/listing.md`, and upload the assets in `play/`.
-3. Everything after that is scripted:
+The app now exists: **`ge.hackerman.gree`**, app id `4974487171322038217`, under the
+personal account `trongio` (`8007123209084828794`). The API confirms it, and the store
+listing and privacy policy URL are saved as a draft.
+
+Still to fill in the console, all of them declarations that only you can make: app access,
+ads, content rating questionnaire, target audience, data safety, government apps,
+financial features. `play/listing.md` has the answers for data safety and content rating.
+
+Tablet screenshots are marked required on the listing but did not block saving. They will
+likely be needed before the listing can be sent for review; the app is phone-shaped, so
+either run it on a tablet emulator or declare it phone-only under Reach and devices.
+
+Everything after that is scripted:
 
 ```sh
 ./gradlew bundleRelease
