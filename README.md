@@ -11,7 +11,10 @@ part: it discovers units on your subnet, binds directly, and talks to them over 
 
 ## Status
 
-Working against firmware `V1.2.1` (protocol v1, AES-128-ECB).
+Verified end to end on a Galaxy S22 Ultra (Android 16) against a Gree unit running
+firmware `V1.2.1` (protocol v1, AES-128-ECB): subnet discovery, local bind, live status
+polling and command writes all confirmed, with writes checked independently against the
+unit from a second client.
 
 ## Features
 
