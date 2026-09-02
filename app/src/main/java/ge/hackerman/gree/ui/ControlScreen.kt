@@ -23,6 +23,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -30,6 +33,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +70,39 @@ fun ControlScreen(
     val c = GreeTheme.colors
     val state = ui.state
 
+    // The glow used to be drawn inside the scrolling column, which clips at its top
+    // edge, slicing the wash off flat under the header. It now lives behind the whole
+    // screen and is anchored to wherever the number actually is, so it can bleed up
+    // past the header and still follow the number as the content scrolls.
+    var rootOrigin by remember { mutableStateOf(Offset.Zero) }
+    var glowCenter by remember { mutableStateOf<Offset?>(null) }
+
+    val tint = when {
+        state == null || !state.power -> Color.Transparent
+        state.mode == GreeMode.COOL -> c.accent.copy(alpha = 0.4f)
+        state.mode == GreeMode.HEAT -> c.warm.copy(alpha = 0.4f)
+        else -> c.ink.copy(alpha = 0.12f)
+    }
+    val glow by animateColorAsState(tint, tween(400), label = "heroTint")
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned { rootOrigin = it.positionInRoot() }
+            .drawBehind {
+                val center = glowCenter ?: return@drawBehind
+                val radius = size.width * 0.52f
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(glow, Color.Transparent),
+                        center = center,
+                        radius = radius,
+                    ),
+                    radius = radius,
+                    center = center,
+                )
+            },
+    ) {
     Column(Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
@@ -134,7 +172,11 @@ fun ControlScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
-            Hero(state = state, onSend = onSend)
+            Hero(
+                state = state,
+                onSend = onSend,
+                onGlowAnchor = { glowCenter = it - rootOrigin },
+            )
             ModeRow(state = state, onSend = onSend)
             FanRow(state = state, onSend = onSend)
             OptionsGrid(state = state, onSend = onSend)
@@ -154,6 +196,7 @@ fun ControlScreen(
                 onPick = { onSend(Gree.SWING_HORIZONTAL to it) },
             )
         }
+    }
     }
 }
 
@@ -180,33 +223,17 @@ private fun PowerButton(on: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun Hero(state: GreeState, onSend: (Pair<String, Int>) -> Unit) {
+private fun Hero(
+    state: GreeState,
+    onSend: (Pair<String, Int>) -> Unit,
+    onGlowAnchor: (Offset) -> Unit,
+) {
     val c = GreeTheme.colors
-
-    // A soft wash behind the number, tinted by what the unit is actually doing.
-    val tint = when {
-        !state.power -> Color.Transparent
-        state.mode == GreeMode.COOL -> c.accent.copy(alpha = 0.4f)
-        state.mode == GreeMode.HEAT -> c.warm.copy(alpha = 0.4f)
-        else -> c.ink.copy(alpha = 0.12f)
-    }
-    val glow by animateColorAsState(tint, tween(400), label = "heroTint")
     val tempAlpha by animateFloatAsState(if (state.power) 1f else 0.3f, tween(300), label = "tempAlpha")
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .drawBehind {
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(glow, Color.Transparent),
-                        center = Offset(size.width / 2f, size.height * 0.44f),
-                        radius = size.width * 0.42f,
-                    ),
-                    radius = size.width * 0.42f,
-                    center = Offset(size.width / 2f, size.height * 0.44f),
-                )
-            }
             .padding(top = 20.dp, bottom = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -223,7 +250,14 @@ private fun Hero(state: GreeState, onSend: (Pair<String, Int>) -> Unit) {
 
             Row(
                 verticalAlignment = Alignment.Top,
-                modifier = Modifier.alpha(tempAlpha),
+                modifier = Modifier
+                    .alpha(tempAlpha)
+                    .onGloballyPositioned {
+                        val p = it.positionInRoot()
+                        onGlowAnchor(
+                            Offset(p.x + it.size.width / 2f, p.y + it.size.height / 2f),
+                        )
+                    },
             ) {
                 Text(
                     "${state.targetTemp}",
