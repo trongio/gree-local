@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Gree Local</string>
+    <string name="w_description">Control one air conditioner from the home screen, over the LAN.</string>
+    <string name="w_power">Power</string>
+    <string name="w_cooler">Cooler</string>
+    <string name="w_warmer">Warmer</string>
+    <string name="w_pick">Which unit?</string>
+    <string name="w_none">No units yet. Open Gree Local and scan first.</string>
 </resources>

@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import ge.hackerman.gree.data.DeviceStore
 import ge.hackerman.gree.data.GreeDevice
 import ge.hackerman.gree.data.LanScanner
+import ge.hackerman.gree.data.StateCache
+import ge.hackerman.gree.widget.GreeWidget
 import ge.hackerman.gree.protocol.GreeClient
 import ge.hackerman.gree.protocol.GreeState
 import kotlinx.coroutines.Job
@@ -128,12 +130,17 @@ class GreeViewModel(application: Application) : AndroidViewModel(application) {
                     .onSuccess { state ->
                         _states.value = _states.value + (device.mac to state)
                         _reachable.value = _reachable.value + (device.mac to true)
+                        StateCache.put(getApplication(), device.mac, state, online = true)
                     }
                     .onFailure {
                         _reachable.value = _reachable.value + (device.mac to false)
+                        StateCache.setOffline(getApplication(), device.mac)
                     }
             }
         }.awaitAll()
+
+        // Anything on the home screen showing this unit is now out of date.
+        GreeWidget.pushAll(getApplication())
     }
 
     // ── discovery ──────────────────────────────────────────────────────────────
@@ -256,6 +263,7 @@ class GreeViewModel(application: Application) : AndroidViewModel(application) {
     fun forget(mac: String) {
         if (_selectedMac.value == mac) select(null)
         store.remove(mac)
+        StateCache.remove(getApplication(), mac)
         _states.value = _states.value - mac
         _reachable.value = _reachable.value - mac
     }

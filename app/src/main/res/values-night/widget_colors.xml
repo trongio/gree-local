@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="w_bg">#071E27</color>
+    <color name="w_card">#0E3341</color>
+    <color name="w_ink">#EEF6F7</color>
+    <color name="w_ink2">#99EEF6F7</color>
+    <color name="w_line">#1AEEF6F7</color>
+    <color name="w_accent">#4FD1C5</color>
+    <color name="w_warm">#F0A58E</color>
+    <color name="w_on_accent">#0B3D4F</color>
+</resources>
