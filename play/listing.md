@@ -43,6 +43,9 @@ Open source: https://github.com/trongio/gree-local
 Not affiliated with, endorsed by, or connected to Gree Electric Appliances. All product
 names and trademarks belong to their respective owners.
 
+## Privacy policy URL
+https://trongio.github.io/gree-local/
+
 ## Category
 Tools / House & Home
 

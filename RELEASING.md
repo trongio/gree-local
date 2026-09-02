@@ -87,5 +87,9 @@ Everything Play asks for is in `play/`:
 | Store listing text | `play/listing.md` |
 | Data safety answers | `play/listing.md` |
 
-The privacy policy is `PRIVACY.md`. Play needs it at a public URL: enabling GitHub Pages
-on this repo, or a gist, is enough.
+Privacy policy URL for the Play listing, already live:
+
+    https://trongio.github.io/gree-local/
+
+Served by GitHub Pages from `main` `/docs`. `PRIVACY.md` is the same text in the repo;
+`docs/index.html` is the copy Play links to, so edit both together.

@@ -36,6 +36,11 @@ Raw `DatagramSocket` and `javax.crypto` with no JS bridge or bundled runtime. Co
 is instant, the APK is small, and there is a clean path to a home screen widget and a
 Quick Settings tile later.
 
+## Privacy
+
+Nothing is collected, sent, or stored off the phone.
+[Full policy](https://trongio.github.io/gree-local/).
+
 ## Build
 
 Requires the Android SDK (compileSdk 36) and JDK 17 or newer.
