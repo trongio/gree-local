@@ -1,4 +1,6 @@
-# Gree Local
+<p align="center">
+  <img src="art/banner-1600x400.png" alt="Gree Local" width="820">
+</p>
 
 A native Android app for controlling Gree air conditioners **entirely over your LAN**.
 No cloud account, no vendor servers, no internet connection required.
