@@ -10,3 +10,7 @@ captures/
 *.apk
 *.keystore
 !debug.keystore
+
+# Play signing: never commit these
+keystore.properties
+*.jks
