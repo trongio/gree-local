@@ -93,13 +93,31 @@ The app now exists: **`ge.hackerman.gree`**, app id `4974487171322038217`, under
 personal account `trongio` (`8007123209084828794`). The API confirms it, and the store
 listing and privacy policy URL are saved as a draft.
 
-Still to fill in the console, all of them declarations that only you can make: app access,
-ads, content rating questionnaire, target audience, data safety, government apps,
-financial features. `play/listing.md` has the answers for data safety and content rating.
+Setup is at **10 of 11**. All eight policy declarations are answered, as recorded below,
+and versionCode 1 is on the internal track.
+
+| Declaration | Answer |
+| --- | --- |
+| Sign in details | Not restricted: no login, no payment, nothing gated |
+| Ads | No ads |
+| Content rating | Category "All Other App Types", every question No. Came back ESRB Everyone, ClassInd All ages |
+| Target audience | 18 and over only, which avoids the Families policy requirements |
+| Data safety | No data collected or shared. Store listing shows "No data collection declared" |
+| Advertising ID | Not used |
+| Government apps | No |
+| Financial features | None |
+| Health apps | None |
+
+**Outstanding, and it needs doing by hand:** store listing contact details, under Grow
+users > Store presence > Store settings. The email and website fields do not accept
+programmatic input, so type them: `giokakabadze50@gmail.com` and
+`https://github.com/trongio/gree-local`. The app category is already set to House & Home.
 
 Tablet screenshots are marked required on the listing but did not block saving. They will
-likely be needed before the listing can be sent for review; the app is phone-shaped, so
-either run it on a tablet emulator or declare it phone-only under Reach and devices.
+likely be needed before review; the app is phone-shaped, so either run it on a tablet
+emulator or declare it phone-only under Reach and devices.
+
+After that: add 12 testers to a closed test, wait 14 days, then apply for production.
 
 Everything after that is scripted:
 
