@@ -87,12 +87,16 @@ fun TemperatureBar(
         animationSpec = tween(if (dragging != null) 0 else 120),
         label = "targetFrac",
     )
-    val barAlpha by animateFloatAsState(if (state.power) 1f else 0.3f, tween(300), label = "barAlpha")
+    // The prototype dims to .3, which works against its light card; on the dark card the
+    // bar all but disappears, so idle is carried by a flatter fill rather than by fading.
+    val barAlpha by animateFloatAsState(if (state.power) 1f else 0.55f, tween(300), label = "barAlpha")
 
     val warmFill = state.power && state.mode == GreeMode.HEAT
     val fill by animateColorAsState(
         targetValue = when {
-            !state.power -> c.line
+            // c.line is a hairline colour: as a fill it leaves nothing to see, and the
+            // thumb ends up floating with no edge to sit against.
+            !state.power -> c.ink.copy(alpha = 0.22f)
             state.mode == GreeMode.HEAT -> c.warm
             state.mode == GreeMode.COOL -> c.accent
             else -> c.ink2
@@ -166,7 +170,9 @@ fun TemperatureBar(
                 val heating = roomFrac != null && roomFrac < targetFrac
                 val lo = roomFrac?.let { minOf(targetFrac, it) } ?: 0f
                 val hi = roomFrac?.let { maxOf(targetFrac, it) } ?: 0f
-                val hasGap = roomFrac != null && hi - lo > 0.001f
+                // The band means "what the unit still has to close". A unit that is off
+                // is closing nothing, and the caption already reads STANDBY.
+                val hasGap = roomFrac != null && state.power && hi - lo > 0.001f
 
                 if (hasGap && !heating) {
                     val left = (barWidth * lo - BAR_RADIUS).coerceAtLeast(0.dp)

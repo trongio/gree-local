@@ -53,6 +53,33 @@ on its next launch. Nothing breaks, it just re-pairs silently.
 Newer firmware (roughly 2022 onward) uses AES-GCM instead of ECB. That variant is not
 implemented yet.
 
+### Room temperature drops by 3 degrees in heat mode
+
+`TemSen` carries the internal sensor with a `+40` bias, so `65` means 25 C. On this unit
+it also **reports 3 degrees lower whenever the mode is heat**, and snaps back on leaving
+it.
+
+That is the air conditioner, not this app. It reproduces with the unit **powered off**,
+where there is no fan, no coil and nothing physical that could move a sensor:
+
+| Mode (unit powered off) | `TemSen` | Reported |
+|---|---|---|
+| Cool | 65 | 25 C |
+| Heat | 62 | 22 C |
+| Cool | 65 | 25 C |
+| Heat | 62 | 22 C |
+| Auto / Dry / Fan | 65 | 25 C |
+
+Heat is the only mode that shifts it, always by exactly 3, instantly and repeatably. So
+the firmware subtracts a constant from the reported value in heat mode. The likely reason
+is the usual one for a wall-mounted split: the unit sits high where the air is warmest, so
+in heating it biases the reading toward what the occupied zone feels rather than what the
+sensor sees. The `+40` encoding is well documented; this heat-mode constant is not, so
+that explanation is inference from the measurement above.
+
+The app deliberately does **not** correct for it. The constant probably varies by model,
+and compensating would make the app disagree with the unit's own display and remote.
+
 ## Not affiliated with Gree
 
 Protocol details are from public reverse engineering work by the community.
