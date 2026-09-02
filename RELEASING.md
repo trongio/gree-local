@@ -20,14 +20,24 @@ label stays the short "Gree Local" so it fits under the icon.
 
 `applicationId` is `ge.hackerman.gree` and is permanent once published.
 
-### 2. Personal accounts need 12 testers for 14 days
+### 2. Closed testing, if the account is a post-2023 personal one
 
-Personal Play Console accounts created after 13 November 2023 must run a closed test with
-at least 12 testers opted in continuously for 14 days before applying for production. It
-applies per app. Organization accounts registered to a legal business entity are exempt.
+The Play Console account already exists and already ships `com.prava.trongio`
+("მართვის მოწმობა - Prava"), so registration and production access are done.
 
-Budget three weeks from first upload to public availability, and line up 12 real people
-with Google accounts.
+The closed-test requirement is nonetheless **per app, not per account**: a personal
+account created on or after 13 November 2023 must run a closed test with 12 testers
+opted in continuously for 14 days before each *new* app reaches production. Updates to an
+app that already has production access are exempt, which is why Prava ships freely.
+
+Two exemptions decide whether this applies here, and only you can confirm which:
+
+- the account was created **before** 13 November 2023, or
+- it is an organization account registered to a legal business entity
+
+If either holds, this app can go straight to production. If neither does, budget about
+three weeks. The hard part is already solved: the same 12 testers may be reused across
+apps, so whoever tested Prava can test this.
 
 ### 3. Local network permission is coming
 
@@ -42,8 +52,19 @@ telling the user why the app cannot see their unit.
 
 ## One-time setup
 
-Create an upload key. Keep the passwords in your password manager and the keystore
-somewhere backed up: losing it means you can never update the listing again.
+An upload key already exists, the one the Prava app uses, with alias `app-key` at
+`PHPNative-DrivingTest-app/credentials/app-release-key.jks`. Google permits reusing an
+upload key across apps in the same account, so there is nothing to generate:
+
+```sh
+cp keystore.properties.example keystore.properties
+# then fill in storePassword and keyPassword
+```
+
+Both `keystore.properties` and `*.jks` are gitignored. Without that file the release
+build still compiles, just unsigned.
+
+To use a separate key for this app instead:
 
 ```sh
 keytool -genkeypair -v \
@@ -52,18 +73,8 @@ keytool -genkeypair -v \
   -alias upload
 ```
 
-Then point the build at it, from a file git already ignores:
-
-```sh
-cat > keystore.properties <<'PROPS'
-storeFile=/home/azael/keys/gree-local-upload.jks
-storePassword=...
-keyAlias=upload
-keyPassword=...
-PROPS
-```
-
-Without that file the release build still compiles, just unsigned.
+Either way the keystore must be backed up. Losing it means never being able to update the
+listing again.
 
 ## Each release
 
