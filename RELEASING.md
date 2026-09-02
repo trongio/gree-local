@@ -120,7 +120,13 @@ Play email lists are account-level, so the `TESTERS` list already used by the Pr
 (18 people) is attached to this app's internal track as well. It is literally the same
 list, so editing it changes both apps' testers.
 
-### Closed testing track: 3 of 4
+### Submitted for review, 2 September 2026
+
+14 changes are in review: the closed testing release, the store listing, and all the
+policy declarations. Google quotes up to 7 days. Approval takes the app out of Draft, at
+which point the 18 testers can opt in and the 14-day clock starts.
+
+### Closed testing track
 
 `Closed testing - Alpha` is set up with the 18-person `TESTERS` list and 177 countries.
 The release is a **draft** of versionCode 1.
@@ -130,8 +136,9 @@ app", and the API rejects anything else with
 
     Only releases with status draft may be created on draft app.
 
-The only step left is sending it to Google for review, which is what takes the app out of
-draft and starts the 14-day tester clock.
+Sent for review. One non-blocking warning on the bundle: no debug symbols uploaded for
+the native libraries, which only makes native crash traces harder to read. Worth fixing in
+a later release by adding a symbols upload, not worth holding this one.
 
 Everything after that is scripted:
 
