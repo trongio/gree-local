@@ -107,7 +107,7 @@ fun ControlScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 16.dp, top = 10.dp),
+                .padding(start = 12.dp, end = 22.dp, top = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -172,11 +172,19 @@ fun ControlScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
-            Hero(
-                state = state,
-                onSend = onSend,
-                onGlowAnchor = { glowCenter = it - rootOrigin },
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 6.dp),
+            ) {
+                TemperatureBar(
+                    state = state,
+                    caption = heroCaption(state),
+                    onSetTemp = { onSend(Gree.SET_TEMP to it) },
+                    onGlowAnchor = { glowCenter = it - rootOrigin },
+                )
+            }
+
             ModeRow(state = state, onSend = onSend)
             FanRow(state = state, onSend = onSend)
             OptionsGrid(state = state, onSend = onSend)
@@ -222,105 +230,13 @@ private fun PowerButton(on: Boolean, onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun Hero(
-    state: GreeState,
-    onSend: (Pair<String, Int>) -> Unit,
-    onGlowAnchor: (Offset) -> Unit,
-) {
-    val c = GreeTheme.colors
-    val tempAlpha by animateFloatAsState(if (state.power) 1f else 0.3f, tween(300), label = "tempAlpha")
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp, bottom = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            StepButton(
-                glyph = Sym.REMOVE,
-                enabled = state.targetTemp > Gree.MIN_TEMP,
-                description = "Cooler",
-            ) { onSend(Gree.SET_TEMP to (state.targetTemp - 1).coerceAtLeast(Gree.MIN_TEMP)) }
-
-            Row(
-                verticalAlignment = Alignment.Top,
-                modifier = Modifier
-                    .alpha(tempAlpha)
-                    .onGloballyPositioned {
-                        val p = it.positionInRoot()
-                        onGlowAnchor(
-                            Offset(p.x + it.size.width / 2f, p.y + it.size.height / 2f),
-                        )
-                    },
-            ) {
-                Text(
-                    "${state.targetTemp}",
-                    fontFamily = AlbertSans,
-                    fontWeight = FontWeight.W200,
-                    fontSize = 132.sp,
-                    lineHeight = 132.sp,
-                    letterSpacing = (-0.05).em,
-                    color = c.ink,
-                )
-                Text(
-                    "°",
-                    fontFamily = AlbertSans,
-                    fontWeight = FontWeight.W300,
-                    fontSize = 36.sp,
-                    lineHeight = 36.sp,
-                    color = c.ink,
-                    modifier = Modifier.padding(top = 14.dp, start = 2.dp),
-                )
-            }
-
-            StepButton(
-                glyph = Sym.ADD,
-                enabled = state.targetTemp < Gree.MAX_TEMP,
-                description = "Warmer",
-            ) { onSend(Gree.SET_TEMP to (state.targetTemp + 1).coerceAtMost(Gree.MAX_TEMP)) }
-        }
-
-        Spacer(Modifier.height(10.dp))
-        Text(
-            text = heroCaption(state),
-            fontFamily = PlexMono,
-            fontSize = 12.sp,
-            lineHeight = 12.sp,
-            letterSpacing = 0.06.em,
-            color = c.ink2,
-        )
-    }
-}
-
+/** Room, mode and fan in one mono line beside the TARGET label. */
 private fun heroCaption(state: GreeState): String {
     val room = state.roomTemp?.let { "ROOM $it°C" } ?: "ROOM —"
     return if (state.power) {
         "$room · ${state.mode.label.uppercase()} · FAN ${state.fan.label.uppercase()}"
     } else {
         "$room · STANDBY"
-    }
-}
-
-@Composable
-private fun StepButton(glyph: String, enabled: Boolean, description: String, onClick: () -> Unit) {
-    val c = GreeTheme.colors
-    Box(
-        modifier = Modifier
-            .size(60.dp)
-            .alpha(if (enabled) 1f else 0.35f)
-            .clip(CircleShape)
-            .background(c.card)
-            .border(1.dp, c.line, CircleShape)
-            .clickable(enabled = enabled, onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Symbol(glyph, 26.sp, c.ink, contentDescription = description)
     }
 }
 
