@@ -117,7 +117,22 @@ Tablet screenshots are marked required on the listing but did not block saving. 
 likely be needed before review; the app is phone-shaped, so either run it on a tablet
 emulator or declare it phone-only under Reach and devices.
 
-After that: add 12 testers to a closed test, wait 14 days, then apply for production.
+### Testers
+
+Play email lists are account-level, so the `TESTERS` list already used by the Prava app
+(18 people) is attached to this app's internal track as well. It is literally the same
+list, so editing it changes both apps' testers.
+
+### Ordering constraint on the closed test
+
+The closed test cannot be created yet. The API refuses it:
+
+    Only releases with status draft may be created on draft app.
+
+The app is still a Draft app, and it leaves that state only once setup is complete and the
+listing goes for review. So the order is: finish the contact details field, send for
+review, then create the closed test, then 12 testers for 14 days, then apply for
+production.
 
 Everything after that is scripted:
 
