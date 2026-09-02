@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Gree Local</title>
+<meta name="description" content="Privacy policy for Gree Local, an unofficial Android app that controls Gree air conditioners entirely over your local network.">
+<link rel="icon" href="mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef4f5;
+    --card: #ffffff;
+    --ink: #0b3d4f;
+    --ink2: rgba(11, 61, 79, .62);
+    --line: rgba(11, 61, 79, .12);
+    --accent: #00696e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #071e27;
+      --card: #0e3341;
+      --ink: #eef6f7;
+      --ink2: rgba(238, 246, 247, .64);
+      --line: rgba(238, 246, 247, .12);
+      --accent: #4fd1c5;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 48px 20px 96px;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 17px/1.65 'Albert Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { max-width: 660px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 44px; }
+  header img { width: 104px; height: auto; }
+
+  h1 {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    margin: 18px 0 6px;
+  }
+
+  .updated {
+    font: 400 12px/1 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink2);
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    margin: 40px 0 10px;
+  }
+
+  p { margin: 0 0 14px; }
+  ul { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+
+  .lede {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 22px 26px;
+    font-size: 19px;
+    font-weight: 500;
+  }
+  .lede p:last-child { margin-bottom: 0; }
+
+  code {
+    font: 400 .88em 'IBM Plex Mono', ui-monospace, monospace;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 2px 6px;
+  }
+
+  a { color: var(--accent); }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--ink2);
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <img src="mark.png" alt="">
+    <h1>Gree Local</h1>
+    <p class="updated">Privacy policy &middot; 2 September 2026</p>
+  </header>
+
+  <div class="lede">
+    <p>Gree Local collects nothing, sends nothing, and has no servers.</p>
+  </div>
+
+  <h2>What the app stores</h2>
+  <p>Everything the app knows stays on your phone, in its private app storage:</p>
+  <ul>
+    <li>the network address, MAC address and display name of each air conditioner you add</li>
+    <li>the encryption key the air conditioner itself issues when the app pairs with it</li>
+    <li>the last known state of each unit (target temperature, mode, fan, room temperature), so the home screen widget can draw without waiting for the unit to answer</li>
+  </ul>
+  <p>Uninstalling the app deletes all of it. Nothing is uploaded anywhere.</p>
+
+  <h2>What the app sends over the network</h2>
+  <p>
+    The app talks only to your air conditioners, directly, on your own local network,
+    using the manufacturer's UDP protocol on port <code>7000</code>. To find units it
+    sends a discovery probe to addresses on the network your phone is connected to.
+  </p>
+  <p>
+    There is no analytics, no crash reporting, no advertising, and no third-party SDK of
+    any kind. The app never contacts a server operated by the developer, by Gree, or by
+    anyone else. It works with the internet disconnected.
+  </p>
+
+  <h2>Permissions</h2>
+  <ul>
+    <li><code>INTERNET</code> and <code>ACCESS_NETWORK_STATE</code> are needed to open a local socket and to read which network the phone is on, so the app knows which addresses to probe.</li>
+    <li><code>ACCESS_WIFI_STATE</code> and <code>CHANGE_WIFI_MULTICAST_STATE</code> are needed to reach units that answer only broadcast discovery.</li>
+  </ul>
+  <p>None of these are used to collect information about you.</p>
+
+  <h2>Children</h2>
+  <p>
+    The app is a remote control for an appliance. It is not directed at children and
+    collects no personal information from anyone.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions or issues:
+    <a href="https://github.com/trongio/gree-local/issues">github.com/trongio/gree-local/issues</a>
+  </p>
+
+  <footer>
+    <p>
+      <strong>Unofficial.</strong> Not affiliated with, endorsed by, or connected to Gree
+      Electric Appliances. Gree is a trademark of its respective owner.
+    </p>
+    <p>
+      Source code:
+      <a href="https://github.com/trongio/gree-local">github.com/trongio/gree-local</a>
+    </p>
+  </footer>
+
+</main>
+</body>
+</html>
