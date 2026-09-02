@@ -361,6 +361,7 @@ private fun ModeRow(state: GreeState, onSend: (Pair<String, Int>) -> Unit) {
 private fun FanRow(state: GreeState, onSend: (Pair<String, Int>) -> Unit) {
     val c = GreeTheme.colors
     val current = state.raw[Gree.FAN_SPEED] ?: 0
+    val auto = current == GreeFan.AUTO.raw
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -378,21 +379,37 @@ private fun FanRow(state: GreeState, onSend: (Pair<String, Int>) -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.Bottom,
         ) {
-            GreeFan.entries.forEachIndexed { index, fan ->
-                // Bars grow left to right; Auto is the single ink bar at rest.
-                val filled = index <= current
-                val bg = when {
-                    index == 0 && current == 0 -> c.ink
-                    filled -> c.accent
-                    else -> c.card
-                }
-                val bgAnim by animateColorAsState(bg, tween(200), label = "fanBg")
+            // Auto is its own control: as one of the bars it just looked like "slowest".
+            val autoBg by animateColorAsState(if (auto) c.ink else c.card, tween(200), label = "autoBg")
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(44.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(autoBg)
+                    .clickable { onSend(Gree.FAN_SPEED to GreeFan.AUTO.raw) },
+                contentAlignment = Alignment.Center,
+            ) {
+                Symbol(
+                    Sym.HDR_AUTO,
+                    20.sp,
+                    if (auto) c.bg else c.ink,
+                    filled = auto,
+                    contentDescription = "Automatic fan speed",
+                )
+            }
+
+            // The ramp now covers real speeds only, Low through High.
+            val speeds = GreeFan.entries.filter { it != GreeFan.AUTO }
+            speeds.forEachIndexed { index, fan ->
+                val filled = !auto && current >= fan.raw
+                val bg by animateColorAsState(if (filled) c.accent else c.card, tween(200), label = "fanBg")
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height((16 + index * 5.6f).dp)
+                        .height((20 + index * 6).dp)
                         .clip(RoundedCornerShape(7.dp))
-                        .background(bgAnim)
+                        .background(bg)
                         .clickable { onSend(Gree.FAN_SPEED to fan.raw) },
                 )
             }
