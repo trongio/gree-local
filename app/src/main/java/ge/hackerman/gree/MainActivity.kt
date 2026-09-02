@@ -2,6 +2,7 @@ package ge.hackerman.gree
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
@@ -28,9 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ge.hackerman.gree.ui.AddByIpSheet
 import ge.hackerman.gree.ui.ControlScreen
 import ge.hackerman.gree.ui.HomeScreen
+import ge.hackerman.gree.ui.TextInputSheet
 import ge.hackerman.gree.ui.theme.Gree
 import ge.hackerman.gree.ui.theme.GreeTheme
 import ge.hackerman.gree.ui.theme.PlexMono
@@ -50,17 +51,20 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun GreeApp(viewModel: GreeViewModel = viewModel()) {
-    val devices by viewModel.devices.collectAsStateWithLifecycle()
-    val selectedMac by viewModel.selectedMac.collectAsStateWithLifecycle()
+    val devices by viewModel.deviceUis.collectAsStateWithLifecycle()
+    val selected by viewModel.selectedUi.collectAsStateWithLifecycle()
     val scanning by viewModel.scanning.collectAsStateWithLifecycle()
     val progress by viewModel.progress.collectAsStateWithLifecycle()
     val hostCount by viewModel.hostCount.collectAsStateWithLifecycle()
     val subnetLabel by viewModel.subnetLabel.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
-    var sheetOpen by remember { mutableStateOf(false) }
+    var addSheetOpen by remember { mutableStateOf(false) }
+    var renaming by remember { mutableStateOf<String?>(null) }
     val colors = Gree.colors
-    val selected = devices.firstOrNull { it.mac == selectedMac }
+
+    // Without this, the system back gesture leaves the app instead of leaving the unit.
+    BackHandler(enabled = selected != null) { viewModel.select(null) }
 
     Box(
         Modifier
@@ -68,36 +72,61 @@ private fun GreeApp(viewModel: GreeViewModel = viewModel()) {
             .background(colors.bg)
             .systemBarsPadding(),
     ) {
-        if (selected == null) {
+        val current = selected
+        if (current == null) {
             HomeScreen(
                 subnetLabel = subnetLabel,
-                devices = devices.map(viewModel::uiFor),
+                devices = devices,
                 scanning = scanning,
                 progress = progress,
                 hostCount = hostCount,
                 onScan = viewModel::scan,
-                onAdd = { sheetOpen = true },
+                onAdd = { addSheetOpen = true },
                 onSelect = viewModel::select,
                 onForget = viewModel::forget,
                 onTogglePower = viewModel::togglePower,
+                onRename = { renaming = it },
             )
         } else {
             ControlScreen(
-                ui = viewModel.uiFor(selected),
+                ui = current,
                 onBack = { viewModel.select(null) },
-                onSend = { viewModel.send(selected.mac, it) },
+                onSend = { viewModel.send(current.device.mac, it) },
+                onRename = { renaming = current.device.mac },
             )
         }
 
         Toast(message)
     }
 
-    if (sheetOpen) {
-        AddByIpSheet(
-            onDismiss = { sheetOpen = false },
+    if (addSheetOpen) {
+        TextInputSheet(
+            title = "Add by IP",
+            description = "For networks that block subnet sweeps. The unit must still be on this Wi-Fi.",
+            placeholder = "192.168.0.199",
+            confirmLabel = "Add",
+            onDismiss = { addSheetOpen = false },
             onConfirm = {
-                sheetOpen = false
+                addSheetOpen = false
                 viewModel.addByIp(it)
+            },
+        )
+    }
+
+    renaming?.let { mac ->
+        val current = devices.firstOrNull { it.device.mac == mac }?.device
+        TextInputSheet(
+            title = "Rename unit",
+            description = "Only stored on this phone. The unit itself keeps its own name.",
+            placeholder = current?.mac?.takeLast(6) ?: "Living room",
+            confirmLabel = "Save",
+            initialValue = current?.name.orEmpty(),
+            mono = false,
+            numeric = false,
+            onDismiss = { renaming = null },
+            onConfirm = {
+                renaming = null
+                viewModel.rename(mac, it)
             },
         )
     }

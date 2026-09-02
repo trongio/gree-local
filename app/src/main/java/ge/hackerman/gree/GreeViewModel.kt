@@ -14,13 +14,16 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /** Faster while a single unit is on screen, slower when polling the whole list. */
 private const val CONTROL_POLL_MS = 3000L
-private const val LIST_POLL_MS = 8000L
+private const val LIST_POLL_MS = 5000L
 
 /** Everything the UI needs about one unit, whether or not it has answered yet. */
 data class DeviceUi(
@@ -57,6 +60,27 @@ class GreeViewModel(application: Application) : AndroidViewModel(application) {
 
     val devices: StateFlow<List<GreeDevice>> = store.devices
 
+    /**
+     * Devices joined with their last poll result. This has to be a flow the UI collects:
+     * reading the state maps directly from a composable never subscribes to them, so the
+     * screen would only catch up when something else happened to trigger recomposition.
+     */
+    val deviceUis: StateFlow<List<DeviceUi>> =
+        combine(store.devices, _states, _reachable) { devices, states, reachable ->
+            devices.map { device ->
+                DeviceUi(
+                    device = device,
+                    state = states[device.mac],
+                    // Unknown counts as online until a poll actually fails.
+                    online = reachable[device.mac] ?: true,
+                )
+            }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    val selectedUi: StateFlow<DeviceUi?> =
+        combine(deviceUis, _selectedMac) { uis, mac -> uis.firstOrNull { it.device.mac == mac } }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     private var pollJob: Job? = null
 
     init {
@@ -67,15 +91,6 @@ class GreeViewModel(application: Application) : AndroidViewModel(application) {
     fun consumeMessage() {
         _message.value = null
     }
-
-    fun uiFor(device: GreeDevice) = DeviceUi(
-        device = device,
-        state = _states.value[device.mac],
-        // Unknown counts as online until a poll actually fails, so cards do not flash red.
-        online = _reachable.value[device.mac] ?: true,
-    )
-
-    fun selected(): GreeDevice? = devices.value.firstOrNull { it.mac == _selectedMac.value }
 
     private fun refreshSubnetLabel() {
         val subnet = LanScanner.currentSubnet(getApplication())
@@ -231,6 +246,11 @@ class GreeViewModel(application: Application) : AndroidViewModel(application) {
     fun togglePower(mac: String) {
         val on = _states.value[mac]?.power ?: false
         send(mac, ge.hackerman.gree.protocol.Gree.POWER to if (on) 0 else 1)
+    }
+
+    fun rename(mac: String, name: String) {
+        val trimmed = name.trim()
+        if (trimmed.isNotEmpty()) store.rename(mac, trimmed)
     }
 
     fun forget(mac: String) {

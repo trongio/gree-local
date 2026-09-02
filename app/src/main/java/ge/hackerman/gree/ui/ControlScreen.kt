@@ -60,6 +60,7 @@ fun ControlScreen(
     ui: DeviceUi,
     onBack: () -> Unit,
     onSend: (Pair<String, Int>) -> Unit,
+    onRename: () -> Unit,
 ) {
     val c = GreeTheme.colors
     val state = ui.state
@@ -81,7 +82,14 @@ fun ControlScreen(
             ) {
                 Symbol(Sym.CHEVRON_LEFT, 26.sp, c.ink, contentDescription = "Back")
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onRename)
+                    .padding(vertical = 2.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 Text(
                     ui.device.name,
                     fontFamily = AlbertSans,

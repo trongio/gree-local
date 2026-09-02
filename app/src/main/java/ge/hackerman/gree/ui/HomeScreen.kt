@@ -7,7 +7,9 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -64,6 +66,7 @@ fun HomeScreen(
     onSelect: (String) -> Unit,
     onForget: (String) -> Unit,
     onTogglePower: (String) -> Unit,
+    onRename: (String) -> Unit,
 ) {
     val c = Gree.colors
 
@@ -119,6 +122,7 @@ fun HomeScreen(
                     DeviceCard(
                         ui = ui,
                         onClick = { onSelect(ui.device.mac) },
+                        onLongClick = { onRename(ui.device.mac) },
                         onForget = { onForget(ui.device.mac) },
                         onTogglePower = { onTogglePower(ui.device.mac) },
                     )
@@ -132,10 +136,12 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DeviceCard(
     ui: DeviceUi,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     onForget: () -> Unit,
     onTogglePower: () -> Unit,
 ) {
@@ -149,7 +155,8 @@ private fun DeviceCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
             .background(c.card)
-            .clickable(onClick = onClick)
+            // Long-press renames; the design has no dedicated affordance for it.
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .padding(start = 20.dp, end = 20.dp, top = 18.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {

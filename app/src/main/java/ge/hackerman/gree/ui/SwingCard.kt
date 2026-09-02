@@ -249,7 +249,9 @@ private fun rayGeometry(horizontal: Boolean): List<Ray> {
     val origin = if (horizontal) Offset(0.5f, 0.23f) else Offset(0.38f, 0.42f)
     val startDeg = if (horizontal) 146.0 else 10.0
     val endDeg = if (horizontal) 34.0 else 82.0
-    val radius = if (horizontal) 0.66f else 0.62f
+    // Kept short enough that the outermost rays stay inside the canvas: the horizontal
+    // fan reaches widest at 146 degrees, which ran off the left edge at 0.66.
+    val radius = if (horizontal) 0.50f else 0.54f
 
     return (0 until Gree.SWING_FIXED_COUNT).map { i ->
         val t = i / (Gree.SWING_FIXED_COUNT - 1).toDouble()

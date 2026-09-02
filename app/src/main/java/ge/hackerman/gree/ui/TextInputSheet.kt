@@ -9,16 +9,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,9 +30,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -38,12 +45,30 @@ import ge.hackerman.gree.ui.theme.AlbertSans
 import ge.hackerman.gree.ui.theme.PlexMono
 import ge.hackerman.gree.ui.theme.Gree as GreeTheme
 
+/**
+ * The one sheet shape the app needs: a title, an explanation, a single field and a
+ * confirm. Used for both adding a unit by IP and renaming one.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddByIpSheet(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+fun TextInputSheet(
+    title: String,
+    description: String,
+    placeholder: String,
+    confirmLabel: String,
+    initialValue: String = "",
+    mono: Boolean = true,
+    numeric: Boolean = true,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
     val c = GreeTheme.colors
-    var ip by remember { mutableStateOf("") }
+    var value by remember { mutableStateOf(initialValue) }
     val sheetState = rememberModalBottomSheetState()
+    val focus = remember { FocusRequester() }
+    val family: FontFamily = if (mono) PlexMono else AlbertSans
+
+    LaunchedEffect(Unit) { focus.requestFocus() }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -61,12 +86,14 @@ fun AddByIpSheet(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
         },
     ) {
         Column(
-            modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 28.dp),
+            modifier = Modifier
+                .imePadding()
+                .padding(start = 24.dp, end = 24.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    "Add by IP",
+                    title,
                     fontFamily = AlbertSans,
                     fontWeight = FontWeight.W600,
                     fontSize = 22.sp,
@@ -74,7 +101,7 @@ fun AddByIpSheet(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
                     color = c.ink,
                 )
                 Text(
-                    "For networks that block subnet sweeps. The unit must still be on this Wi-Fi.",
+                    description,
                     fontFamily = AlbertSans,
                     fontSize = 13.sp,
                     lineHeight = 19.sp,
@@ -93,25 +120,24 @@ fun AddByIpSheet(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
                 contentAlignment = Alignment.CenterStart,
             ) {
                 BasicTextField(
-                    value = ip,
-                    onValueChange = { ip = it },
+                    value = value,
+                    onValueChange = { value = it },
                     singleLine = true,
-                    textStyle = TextStyle(
-                        fontFamily = PlexMono,
-                        fontSize = 18.sp,
-                        color = c.ink,
-                    ),
+                    textStyle = TextStyle(fontFamily = family, fontSize = 18.sp, color = c.ink),
                     cursorBrush = SolidColor(c.accent),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = if (numeric) KeyboardType.Decimal else KeyboardType.Text,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { if (value.isNotBlank()) onConfirm(value.trim()) },
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focus),
                     decorationBox = { inner ->
-                        if (ip.isEmpty()) {
-                            Text(
-                                "192.168.0.199",
-                                fontFamily = PlexMono,
-                                fontSize = 18.sp,
-                                color = c.ink2,
-                            )
+                        if (value.isEmpty()) {
+                            Text(placeholder, fontFamily = family, fontSize = 18.sp, color = c.ink2)
                         }
                         inner()
                     },
@@ -142,15 +168,15 @@ fun AddByIpSheet(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
                 Box(
                     modifier = Modifier
                         .height(48.dp)
-                        .alpha(if (ip.isNotBlank()) 1f else 0.4f)
+                        .alpha(if (value.isNotBlank()) 1f else 0.4f)
                         .clip(RoundedCornerShape(24.dp))
                         .background(c.ink)
-                        .clickable(enabled = ip.isNotBlank()) { onConfirm(ip.trim()) }
+                        .clickable(enabled = value.isNotBlank()) { onConfirm(value.trim()) }
                         .padding(horizontal = 24.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        "Add",
+                        confirmLabel,
                         fontFamily = AlbertSans,
                         fontWeight = FontWeight.W600,
                         fontSize = 15.sp,
